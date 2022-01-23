@@ -28,6 +28,7 @@
       <div class="container">
         상세페이지임 
         <button id="edit">수정</button>  
+        <button id="chat">채팅</button>  
         
     </div>
 
@@ -69,7 +70,7 @@
             
             <div class="detail-pic my-4" style="background-image: url('${res.data().url}');"></div>
             <div>
-            <h5>올린사람 : 모름</h5>
+            <h5>올린사람 : ${res.data().이름}</h5>
             <hr>
             <h5 class="title">${res.data().제목}</h5>
             <p class="date">${res.data().날짜}</p>
@@ -82,7 +83,17 @@
     $('#edit').click(function(){
         window.location.href = '/edit.html?id=' + 쿼리스트링.get('id')
     })
-
+    $('#chat').click(function(){
+      firebase.auth().onAuthStateChanged((user)=>{
+      if (user) {
+        var 저장할거 = {
+          uid: user.uid,
+          time: new Date()
+        }
+        db.collection('chatroom').add(저장할거)
+      } 
+    })
+    })
     
 
   </script>

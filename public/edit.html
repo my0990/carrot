@@ -27,9 +27,9 @@
       </ul>
       <div class="container mt-3">
         <input type="text" class="form-control mt-2" id="title" placeholder="title">
-        <textarea class="form-control mt-2" id="content">content</textarea>
+        <textarea class="form-control mt-2" id="content"></textarea>
         <input type="text" class="form-control mt-2" id="price" placeholder="price">
-        <button class="btn btn-danger mt-3" id="send">올리기</button>
+        <button class="btn btn-danger mt-3" id="send">수정하기</button>
       </div>
   <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-auth.js"></script>
@@ -59,39 +59,28 @@
   <script>
     const storage = firebase.storage();
     const db = firebase.firestore();
+    var 쿼리스트링 = new URLSearchParams(window.location.search);
+    db.collection('product').doc(쿼리스트링.get('id')).get().then((res)=>{
+      $('#title').attr("value",res.data().제목);
+      $('#content').append(res.data().내용);
+      $('#price').attr("value",res.data().가격);
+    })
+
+
+
     $('#send').click(function(){
 
-      var file = document.querySelector('#image').files[0]
-      var storageRef = storage.ref();
-      var 저장할경로 = storageRef.child('image/' + file.name);
-      var 업로드작업 = 저장할경로.put(file);
-      업로드작업.on('state_changed',
-        null,
-        (error) => {
-          console.error('실패사유는', error);
-        },
-        () => {
-          업로드작업.snapshot.ref.getDownloadURL().then((url) => {
-            var 저장할거 = {
-              제목: $('#title').val(),
-              가격: $('#price').val(),
-              내용: $('#content').val(),
-              날짜: new Date(),
-              url: url,
-              uid: JSON.parse(localStorage.getItem('user')).uid,
-              이름 : JSON.parse(localStorage.getItem('user')).displayName
-            }
+      var 저장할거 = {
+        제목: $('#title').val(),
+        가격: $('#price').val(),
+        내용: $('#content').val(),
+      }
 
-            
-            
-            db.collection('product').add(저장할거).then((result)=>{
-              console.log(result)
-              window.location.href = "/index.html"
-            }).catch((err)=>{
-              console.log(err)
-            });
-          })
-        })
+      
+      db.collection('product').doc(쿼리스트링.get('id')).update(저장할거)
+
+          
+        
     })
 
   </script>
