@@ -29,10 +29,7 @@
           <div class="row">
             <div class="col-3 p-0">
               <ul class="list-group chat-list">
-                <li class="list-group-item">
-                  <h6>채팅방1</h6>
-                  <h6 class="text-small">채팅방아이디</h6>
-                </li>
+
               </ul>
             </div>
             <div class="col-9 p-0">
@@ -80,7 +77,43 @@
   <script>
     const storage = firebase.storage();
     const db = firebase.firestore();
-    
+    var 내uid = JSON.parse(localStorage.getItem('user')).uid;
+    db.collection('chatroom').where('who','array-contains',내uid).get().then((res)=>{
+      console.log(내uid)
+      res.forEach((a)=>{
+        var 템플릿 = `
+        <li class="list-group-item">
+          <h6>${a.data().product}</h6>
+          <h6 class="text-small">${a.id}</h6>
+        </li>
+        `;
+      $('.chat-list').append(템플릿);
+      });
+      $('.list-group-item').click(function(){
+        채팅방id = $(this).children('.text-small').text();
+        db.collection('chatroom').doc(채팅방id).collection('messages').get().then((res)=>{
+
+          res.forEach((a)=>{
+            console.log(a.data().content)
+            // var 템플릿 = 
+            //   `<li><span class="chat-box mine">${res.content}</span></li>`
+            
+            // $('.chat-content').append(템플릿)
+          })
+          })
+        })
+      });
+    var 채팅방id
+    $('#send').click(function(){
+      var 데이터 = {
+        content: $('#chat-input').val(),
+        date: new Date(),
+        uid: 내uid
+      }
+      db.collection('chatroom').doc(채팅방id).collection('messages').add(데이터);
+    })
+
+
 
     
 
